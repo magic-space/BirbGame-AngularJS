@@ -12,6 +12,8 @@ However, your Peeps will need to be fed, and regular maintainence on housing, st
 
 There currently is no "win" condition, just keep growing your peep-ulation and amass resources.
 
+If you'd like to start over, click the gear in the top right corner to wipe your save file.
+
 ## Changelog
 ### 0.9.0.1:
 - Fixed an upkeep bug in Chrome (Nest wasn't working)
