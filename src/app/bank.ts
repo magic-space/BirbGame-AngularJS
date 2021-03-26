@@ -25,7 +25,7 @@ export const TASKBANK: Task[] =
 
 	{ dur:30, 	var:10,	yield:1, val:1, wgt:1, upkeep:1, code:"Seeds", group:"Food", name:"Farming",
 		desc:"A staple. Not worth much, but fundamental for healthy living." }, 
-	{ dur:240, 	var:45,	yield:2, val:6, wgt:2, upkeep:3, code:"Bugs", group:"Food", name:"Catching",
+	{ dur:240, 	var:45,	yield:2, val:10, wgt:2, upkeep:3, code:"Bugs", group:"Food", name:"Catching",
 		desc:"Squishy and slimy, yet satisfying! Takes a bit to catch them all."  },
 	{ dur:90,	var:20,	yield:4, val:3, wgt:2, upkeep:1, code:"Fruit", group:"Food", name:"Picking",
 		desc:"Sweet and juicy, the perfect snack that doesn't bite back."  },

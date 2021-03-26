@@ -162,7 +162,7 @@ export class PlayerComponent implements OnInit
     this.Res_Upkeep.set("Food", upkeep_food - 1);
 
     let upkeep_nest = (this.Upg_House * (this.Upg_House + 1))/2;
-    for(let c of this.Resources)
+    for(let c of this.Upg_Capacity.keys())
     {
       let upgLv = this.Upg_Capacity.get(c) as number;
       upkeep_nest += Math.ceil((upgLv * Math.sqrt(upgLv + 1))/2);
@@ -295,7 +295,9 @@ export class PlayerComponent implements OnInit
 
       // Go through each resource in this resource group from lowest value to highest value //
       let taskGroup = TASKBANK.filter(t => t.group === res);
-      taskGroup.sort(r => r.val).reverse();
+      taskGroup.sort(res => res.val);
+      if(taskGroup[0].val > taskGroup[1].val)
+        taskGroup.reverse();
 
       for(let t = 0; t < taskGroup.length; t++)
       { // Calculate how many units are required from this resource //
@@ -322,7 +324,9 @@ export class PlayerComponent implements OnInit
 
       // Go through each resource in this resource group from lowest value to highest value //
       let taskGroup = TASKBANK.filter(t => t.group === this.Resources[r]);
-      taskGroup.sort(res => res.val).reverse();
+      taskGroup.sort(res => res.val);
+      if(taskGroup[0].val > taskGroup[1].val)
+        taskGroup.reverse();
 
       for(let t = 0; t < taskGroup.length; t++)
       { // Calculate how many units are required from this resource //
