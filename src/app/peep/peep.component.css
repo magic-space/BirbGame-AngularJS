@@ -1,0 +1,24 @@
+/* Peep base image */
+.peep
+{
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 64px;
+	height: 64px;
+	background-size: 192px 64px;
+}
+
+/* Peep position */
+.back{ background-position-x: -0px; }
+.side{ background-position-x: -64px; }
+.front{ background-position-x: -128px; }
+
+/* Peep sprite sheets */
+#egg					{ background-image: url('../../assets/peeps/Egg.png');}
+#blackCrestedTitmouse	{ background-image: url('../../assets/peeps/Black Crested Titmouse.png'); }
+#blueTit 				{ background-image: url('../../assets/peeps/Blue Tit.png'); }
+#europeanRobin			{ background-image: url('../../assets/peeps/European Robin.png'); }
+#goldenCrestedKinglet	{ background-image: url('../../assets/peeps/Golden Crested Kinglet.png'); }
+#houseSparrow			{ background-image: url('../../assets/peeps/House Sparrow.png'); }
+#houseWren				{ background-image: url('../../assets/peeps/House Wren.png'); }

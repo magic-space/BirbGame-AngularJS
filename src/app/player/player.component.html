@@ -1,0 +1,256 @@
+<!--==================-->
+<!--=== BACKGROUND ===-->
+<!--==================-->
+<img class="village" src="../../assets/village/Base.png" />
+
+<img class="village" src="../../assets/village/Peeps1.png" *ngIf="Upg_House === 1"/>
+<img class="village" src="../../assets/village/Peeps2.png" *ngIf="Upg_House === 2"/>
+<img class="village" src="../../assets/village/Peeps3.png" *ngIf="Upg_House > 2"/>
+
+<img class="village" src="../../assets/village/Seeds1.png" 
+	*ngIf="peepService.GetPeepsByTask('Seeds').length > 0"/>
+<img class="village" src="../../assets/village/Seeds2.png" 
+	*ngIf="peepService.GetPeepsByTask('Seeds').length > 4"/>
+<img class="village" src="../../assets/village/Seeds3.png" 
+	*ngIf="peepService.GetPeepsByTask('Seeds').length > 9"/>
+
+<img class="village" src="../../assets/village/Dock1.png" 
+	*ngIf="peepService.GetPeepsByTask('Fish').length > 0"/>
+<img class="village" src="../../assets/village/Library2.png" 
+	*ngIf="peepService.GetPeepsByTask('Books').length > 0"/>
+
+<img class="village" src="../../assets/village/Silo1.png" 
+	*ngIf="UpgCapQuery('Food') > 0"/>
+<img class="village" src="../../assets/village/Woodshack1.png" 
+	*ngIf="UpgCapQuery('Nest') > 0"/>
+
+<span class="tip" style="position:absolute; right:0px; top:0px;" (click)="WipeSave()" >
+	<span class="tiptxt-low" style="width:120px; right:0px;">
+		Wipe Save?
+	</span>
+	<img src="../../assets/icons/Gear.png" />
+</span>
+
+<!--=============-->
+<!--=== PEEPS ===-->
+<!--=============-->
+<br />
+<label>{{Clock}}</label>
+<div *ngIf="Peeps.length">
+	<span *ngFor="let p of Peeps">
+		<app-peep [peep]="p.peep"></app-peep>
+	</span>
+</div>
+<br />
+
+<!--===================-->
+<!--=== PEEPS PANEL ===-->
+<!--===================-->
+<div class="resourceList" style="left:0px; top:0px; border-radius:0px 0px 8px 8px;">
+	<!-- ------------------- -->
+	<!-- Peep icon + tooltip -->
+	<div class="tip" style="grid-area:1 1;">
+		<span class="tiptxt-low">
+			Idle / Total Peeps (Housing Capacity)
+			<br /><br />
+			Peeps form the fundamental building blocks of any society. Assign them to tasks to acquire materials.
+		</span>
+
+		<img class="resource" id="Peep" src="../../assets/icons/Transparent.png" />
+	</div>
+
+	<!-- Number of Idle / Total (Max) peeps -->
+	<label style="grid-area:1 2; font-weight: bold;">
+		{{peepService.GetPeepsByTask('Idle').length}} / 
+		{{peepService.Peeps.length}} ({{Peep_Housing}})
+	</label>
+
+	<!-- Build housing button + tooltip -->
+	<div class="tip" style="grid-area:1 3; text-align:center;">
+		<span class="tiptxt-low">
+			Upgrade {{Upg_House + 1}}:
+			<span *ngIf="!IsMaxUpgrade('House')">
+				(+{{Upg_Change.get('House')}} Max Peeps)
+				<br />
+				<span *ngFor="let c of [0, 1, 2, 3]">
+				<span *ngIf="CostQuery('House')[c] > 0"> |
+					<span [style.color]="ResAmount(Resources[c]) >= CostQuery('House')[c] ? 'white' : 'red'">
+						{{CostQuery('House')[c]}}
+					</span>
+					<img class="resource-tip" [id]="Resources[c] + '-tip'" src="../../assets/icons/Transparent.png"/>
+				</span>
+				</span> |
+			</span>
+			<span *ngIf="IsMaxUpgrade('House')">Maxed!</span>
+			<br /><br />
+			Increases the housing capacity, allowing more Peeps to be born.
+		</span>
+	
+		<!-- The plus and house icons -->
+		<span (click)="AddHouse()">
+			<img class="icon" id="plus" src="../../assets/icons/Transparent.png" />
+			<img class="icon" src="../../assets/icons/House.png" />
+		</span>
+	</div>
+
+	<!-- ------------------ -->
+	<!-- Egg icon + tooltip -->
+	<div class="tip" style="grid-area:2 1;">
+		<span class="tiptxt-low">
+			Eggs will hatch into new Peeps after a time.
+		</span>
+		<img class="icon" src="../../assets/icons/Egg.png" />
+	</div>
+
+	<!-- Number of Eggs present -->
+	<label style="font-weight: bold; grid-area:2 2;">
+		{{peepService.GetPeepsByTask('Egg').length}}
+	</label>
+
+	<!-- Make peep button + tooltip -->
+	<div class="tip" style="grid-area:2 3; text-align:center;">
+		<span class="tiptxt-low">
+			<span [style.color]="ResAmount('Food') >= Peep_Cost[0] ? 'white' : 'red'">
+				{{Peep_Cost[0]}}
+			</span>
+			<img class="resource-tip" [id]="Resources[0] + '-tip'" src="../../assets/icons/Transparent.png"/>
+			<br />
+			Make a new Peep.
+		</span>
+
+		<!-- The plus and egg icons -->
+		<span  (click)="AddPeep()">
+			<img class="icon" id="plus" src="../../assets/icons/Transparent.png" />
+			<img class="icon" src="../../assets/icons/Egg.png" />
+		</span>
+	</div>
+</div>
+
+<!--=======================-->
+<!--=== RESOURCE PANELS ===-->
+<!--=======================-->
+<div *ngFor="let res of Resources">
+<div class="resourceList" style="bottom:0px;" [style.left]="320*Resources.indexOf(res) + 'px'">
+<!-- --------------- -->
+<!-- Resource header -->
+<div style="grid-column: 1/4; display:grid; grid-template-columns: 32px 180px 80px;
+	background-color:#cccccc; padding:4px;
+	border: 0px black solid; border-radius: 4px">
+
+	<span class="tip" style="grid-area:1/1/span 1/span 1;" (click)="Upgrade_Capacity(res)">
+		<span class="tiptxt">
+			<!-- Capacity + upkeep -->
+			Capacity: {{Res_Storage.get(res)}} / {{Res_Capacity.get(res)}} ({{ResPercent(res)}}%)
+			<span *ngIf="res !== 'Skill'">
+				<br />
+				Daily Upkeep: - {{Res_Upkeep.get(res)}}
+				<img class="resource-tip" [id]="res + '-tip'" src="../../assets/icons/Transparent.png"/>
+			</span>
+			<br /><br />
+
+			<!-- Next upgrade change + costs -->
+			Upgrade {{UpgCapQuery(res) + 1}}:
+			<span *ngIf="!IsMaxUpgrade(res)">
+				(+{{Upg_Change.get(res)}} Capacity)
+				<br />
+				<span *ngFor="let c of [0, 1, 2, 3]">
+				<span *ngIf="CostQuery(res)[c] > 0"> |
+					<span [style.color]="ResAmount(Resources[c]) >= CostQuery(res)[c] ? 'white' : 'red'">
+						{{CostQuery(res)[c]}}
+					</span>
+					<img class="resource-tip" [id]="Resources[c] + '-tip'" src="../../assets/icons/Transparent.png"/>
+				</span>
+				</span> |
+			</span>
+			<span *ngIf="IsMaxUpgrade(res)">Maxed!</span>
+		</span>
+
+		<!-- The resource icon -->
+		<img class="resource" [id]="res" src="../../assets/icons/Transparent.png"/>
+	</span>
+	
+	<!-- Current resource amounts + multicolored capacity bar -->
+	<label style="grid-area: 1/2/span 1/span 2; font-weight: bold;">
+		{{res}}: {{Res_Amount.get(res)}}
+	</label>
+	<div style="grid-area:2/1/span 1/span 3; width:100%; height:16px; 
+		background-color: #eeeeee; display:inline-block;">
+		<span *ngFor="let task of TasksInGroup(res)">
+		<div style="display:inline-block; height:16px;" 
+			[style.backgroundColor]="TaskColor.get(task.code)"
+			[style.width]="TaskPercent(task.code) + '%'"></div>
+		</span>
+	</div>
+</div>
+
+<!-- ------------------------------- -->
+<!-- Individual panels for each task -->
+<div *ngFor="let task of TasksInGroup(res)" 
+	style="grid-column: 1/3;" 
+	[hidden]="!Unlocks.get(task.code)">
+
+	<span *ngIf="Unlocks.get(task.code)"
+		style="display:grid; grid-template-columns: 32px 180px 80px;"
+		[style.gridRow]="TasksInGroup(res).indexOf(task) + 2">
+
+		<!-- The resource icon and the current # of units -->
+		<span class="tip" style="grid-column:1;" (click)="Upgrade_Production(task.code)">
+			<span class="tiptxt">
+				Upgrade {{UpgProdQuery(task.code) + 1}}: 
+				<span *ngIf="!IsMaxUpgrade(task.code)">
+					<span *ngFor="let c of [0, 1, 2, 3]">
+					<span *ngIf="CostQuery(task.code)[c] > 0">|
+						<span [style.color]="ResAmount(Resources[c]) >= CostQuery(task.code)[c] ? 'white' : 'red'">
+							{{CostQuery(task.code)[c]}}
+						</span>
+						<img class="resource-tip" [id]="Resources[c] + '-tip'"
+							src="../../assets/icons/Transparent.png"/>
+					</span>
+					</span> |
+				</span>
+				<span *ngIf="IsMaxUpgrade(task.code)">
+					Maxed!
+				</span>
+				<br /><br />
+
+				Yield: {{task.yield}} | 
+				Value: {{task.val}} 
+				<img class="resource-tip" [id]="res + '-tip'"
+					src="../../assets/icons/Transparent.png"/>
+				| Weight: {{task.wgt}}
+				<br /><br />
+				{{task.desc}}				
+			</span>
+
+			<img class="icon" style="border-radius:4px;" (click)="Upgrade_Task(task)"
+				[src]="'../../assets/resources/' + task.code + '.png'" />
+		</span>
+
+		<label style="grid-column:2;">
+			{{task.code}} : {{Res_Units.get(task.code)}}
+		</label>
+
+		<!-- The Hire/Fire buttons and current peeps working -->
+		<span *ngIf="(task.code !== 'Instinct') && (task.code !== 'Song')"
+			style="grid-column:3; display:grid; grid-template-columns: 24px 32px 24px;">
+			
+			<img class="icon" id="plus" (click)="HirePeep(task.code)"
+				style="grid-column:1; background-color: #88ff88;
+					border: #00cc00 solid 1px; border-radius: 8px;"
+				src="../../assets/icons/Transparent.png" />
+
+			<label style="grid-column:2; text-align:center;">
+				{{peepService.GetPeepsByTask(task.code).length}}
+			</label>
+
+			<img class="icon" id="minus" (click)="FirePeep(task.code)"
+				style="grid-column:3; background-color: #ff8888;
+					border: #ff0000 solid 1px; border-radius: 8px;"
+				src="../../assets/icons/Transparent.png" />
+		</span>
+	</span>
+
+	
+</div>
+</div>
+</div>
