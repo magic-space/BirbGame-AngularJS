@@ -16,7 +16,7 @@ If you'd like to start over, click the gear in the top right corner to wipe your
 
 ## Changelog
 ### 0.9.0.1:
-- Fixed an upkeep bug in Chrome (Nest wasn't working)
+- Fixed an upkeep bug in Chrome (Nest wasn't working - now it's not working in Firefox?)
 - Buffed Bugs to be more valuable and less useless
 
 ### 0.9.0:
