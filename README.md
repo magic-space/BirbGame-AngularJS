@@ -1,27 +1,22 @@
-# BirbgameAngular
+# The Birbgame
+
+To run the application in stand-alone mode, please use the `dist` folder's `index.html`. Compiling the TypeScript using Angular 2 should be possible with the source code present in `src`. Unfortunately, the `node_modules` foler was too large to be included in a GitHub repository. Please let me know if you need the contents of that folder.
+
+## How to play ##
+
+You will begin with a single egg, which will hatch as time passes. This Peep is your go-to for collecting natural resources, including food, nesting materials, ore, and the skills to survive in this cruel world. Each resource comes with multiple tasks that can be done, growing in complexity.
+
+Clicking on a resource or task's icon will allow it to be upgraded, either increasing that resource capacity, or increasing the yield of that task.
+
+However, your Peeps will need to be fed, and regular maintainence on housing, storage facilities, and tools will need to be performed. As such, you will find your food, nest, and ore supplies dwindling over time, requiring constant production to stay afloat! Make sure to balance your assignments accordingly. 
+
+There currently is no "win" condition, just keep growing your peep-ulation and amass resources.
+
+## Changelog
+
+### 0.9.0:
+Preliminary release as an Angular application. Fine-tuning needs to be done.
+
+
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.4.
-
-## Development server
-
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
