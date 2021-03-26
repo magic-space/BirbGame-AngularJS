@@ -13,6 +13,9 @@ However, your Peeps will need to be fed, and regular maintainence on housing, st
 There currently is no "win" condition, just keep growing your peep-ulation and amass resources.
 
 ## Changelog
+### 0.9.0.1:
+- Fixed an upkeep bug in Chrome (Nest wasn't working)
+- Buffed Bugs to be more valuable and less useless
 
 ### 0.9.0:
 Preliminary release as an Angular application. Fine-tuning needs to be done.
