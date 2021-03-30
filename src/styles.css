@@ -1,1 +1,111 @@
-/* You can add global styles to this file, and also import other style files */
+label {
+	font-size: 20px;
+	font-family: Verdana;
+}
+
+/* ============== */
+/* === IMAGES === */
+/* ============== */
+/* Icons */
+.ICON
+{	/* For + and - */
+	width: 24px;
+	height: 24px;
+
+	background-size: 72px 24px;
+	background-position-x: -24px;
+}
+.ICON:hover { background-position-x: -48px; }
+
+#PLUS { background-image: url('assets/icons/Plus.png'); }
+#MINUS { background-image: url('assets/icons/Minus.png'); }
+
+/* Resources */
+.RESOURCE
+{
+	width: 24px;
+	height: 24px;
+
+	background-size: 144px 24px;
+	background-image: url('assets/icons/Resources.png');
+}
+
+#Peep { background-position-x: -0px; }
+#Food { background-position-x: -24px; }
+#Nest { background-position-x: -48px; }
+#Ore { background-position-x: -72px; }
+#Alchemy { background-position-x: -96px; }
+#Skill { background-position-x: -120px; }
+
+/* ================ */
+/* === TOOLTIPS === */
+/* ================ */
+.TIP { /* For aligning the tooltip over the spanned content */
+	position: relative;
+	display: inline-block;
+}
+.TIP .TIPTXT { /* The style of the textbox that is set to appear */
+	visibility: hidden;
+	background-color: rgba(0, 0, 0, 0.7);
+	color: white;
+	position: absolute;
+	z-index: 1;
+	width: 292px;
+	padding: 4px;
+	border-radius: 4px;
+	font-size: 14px;
+	text-align: center;
+	font-family: Verdana;
+}
+.TIP:hover .TIPTXT { /* Change the tooltip visibilty on mouse hover */
+	visibility: visible;
+}
+
+.TIPTOP { bottom: 28px; }	/* Make the tooltip appear below the content */
+.TIPBOT { top: 28px; }		/* Make the tooltip appear above the content */
+
+/* === Resource images for tooltips === */
+.RESOURCE-TIP {
+	width: 16px;
+	height: 16px;
+	background-size: 96px 16px;
+	background-image: url('assets/icons/Resources.png');
+	vertical-align: text-bottom;
+}
+
+#Peep-TIP { background-position-x: -0px; }
+#Food-TIP { background-position-x: -16px; }
+#Nest-TIP { background-position-x: -32px; }
+#Ore-TIP { background-position-x: -48px; }
+#Alchemy-TIP { background-position-x: -64px; }
+#Skill-TIP { background-position-x: -80px; }
+
+/* ============= */
+/* === PEEPS === */
+/* ============= */
+/* Peep base image */
+.PEEP
+{
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 64px;
+	height: 64px;
+	background-size: 192px 64px;
+}
+
+/* Peep position */
+.BACK{ background-position-x: -0px; }
+.SIDE{ background-position-x: -64px; }
+.FRONT{ background-position-x: -128px; }
+
+/* Peep sprite sheets */
+#egg					{ background-image: url('assets/peeps/Egg.png');}
+#chick					{ background-image: url('assets/peeps/Chick.png');}
+#void					{ background-image: url('assets/peeps/Void.png');}
+#blackCrestedTitmouse	{ background-image: url('assets/peeps/Black Crested Titmouse.png'); }
+#blueTit 				{ background-image: url('assets/peeps/Blue Tit.png'); }
+#europeanRobin			{ background-image: url('assets/peeps/European Robin.png'); }
+#goldenCrestedKinglet	{ background-image: url('assets/peeps/Golden Crested Kinglet.png'); }
+#houseSparrow			{ background-image: url('assets/peeps/House Sparrow.png'); }
+#houseWren				{ background-image: url('assets/peeps/House Wren.png'); }

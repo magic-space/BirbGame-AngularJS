@@ -1,0 +1,85 @@
+<span *ngIf="Task"
+	  style="display:grid; grid-template-columns: 32px 180px 80px;">
+
+	<!-- The task icon and the current # of units -->
+	<span class="TIP" style="grid-area: 1/1/span 1/span 1;">
+
+		<!-- Task Tooltip -->
+		<span class="TIPTXT TIPTOP">
+			<!-- Task statistics -->
+			Time: {{Task.dur}} | Weight: {{Task.wgt}}
+			<br />
+			Yield: {{Task.yield + taskService.BonusYield(Task)}} | Value: {{Task.val}}
+			<img class="RESOURCE-TIP" [id]="Task.res + '-TIP'"
+				 src="../../assets/icons/Transparent.png" />
+			<br />
+			<!-- Task units -->
+			Units: {{Units}}
+			<br /><br />
+
+			<!-- Current upgrade costs -->
+			Upgrade #{{taskService.UpgradeNum(Task) + 1}}:
+			<span *ngIf="taskService.CanUpgrade(Task)">
+				<!-- There is an upgrade cost to display -->
+				<span *ngFor="let c of [0,1,2,3,4]">
+					<span *ngIf="taskService.UpgradeCost(Task)[c] > 0">
+						|
+						<!-- Display the cost of this resource -->
+						<span [style.color]="resourceService.ResAmt(resourceService.Resources[c]) >= taskService.UpgradeCost(Task)[c] ? 'white' : 'red'">
+							{{taskService.UpgradeCost(Task)[c]}}
+						</span>
+						<img class="RESOURCE-TIP" [id]="resourceService.Resources[c].code + '-TIP'"
+							 src="../../assets/icons/Transparent.png" />
+					</span>
+				</span> |
+				<br />
+
+				<!-- Queries for the changes this upgrade -->
+				Time {{taskService.BonusDurationDelta(Task)}}
+				<span *ngIf="(taskService.UpgradeNum(Task) % 2 === 0) && (taskService.UpgradeNum(Task) > 0)">
+					| Yield + 1
+				</span>
+				<span *ngIf="(taskService.UpgradeNum(Task) % 3 === 0) && (taskService.UpgradeNum(Task) > 0)">
+					| Carry + 1
+				</span>
+			</span>
+			<span *ngIf="!taskService.CanUpgrade(Task)">
+				Maxed!
+			</span>
+			<br /><br />
+
+			<!-- Task description -->
+			{{Task.desc}}
+		</span>
+
+		<!-- Task image -->
+		<img class="ICON" style="border-radius:4px;" (click)="Upgrade(Task)"
+			 [src]="'../../assets/resources/' + Task.code + '.png'" />
+	</span>
+
+	<!-- Task name and number of units in storage -->
+	<label style="grid-area: 1/2/span 1/span 1;">
+		{{Task.code}} : {{Units * Task.val}}
+	</label>
+
+	<!-- The Hire/Fire buttons and current peeps assigned -->
+	<span *ngIf="(Task.code !== 'Instinct') && (Task.code !== 'Song')"
+		  style="grid-area: 1/3/span 1/span 1; display:grid; grid-template-columns: 24px 32px 24px;">
+		<!-- Hire button -->
+		<img class="ICON" id="PLUS" (click)="HirePeep(Task)"
+			 style="grid-column:1; background-color: #88ff88;
+					border: #00cc00 solid 1px; border-radius: 8px;"
+			 src="../../assets/icons/Transparent.png" />
+
+		<!-- Peeps assigned -->
+		<label style="grid-column:2; text-align:center;">
+			{{peepService.PeepsByTask(Task).length}}
+		</label>
+
+		<!-- Fire button -->
+		<img class="ICON" id="MINUS" (click)="FirePeep(Task)"
+			 style="grid-column:3; background-color: #ff8888;
+					border: #ff0000 solid 1px; border-radius: 8px;"
+			 src="../../assets/icons/Transparent.png" />
+	</span>
+</span>

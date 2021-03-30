@@ -1,175 +1,187 @@
+// =============== //
 // === IMPORTS === //
+// =============== //
 // External //
 import { Injectable } from '@angular/core';
 
 // Internal //
 import { Peep } from './peep';
 import { Task } from './task';
-import { PEEPBANK, PEEPMAP, TASKBANK, TASKMAP } from './bank';
+import { BANK_PEEP, BANK_TASK, COSTS_HOUSING } from './bank';
 
+// ========================== //
 // === SERVICE DEFINITION === //
-@Injectable({
-  providedIn: 'root'
-})
-export class PeepService 
-{ // -- Parameters -- //
-  Peeps : Peep[] = [];
-  Upgrades : Map<string, number> = new Map<string, number> ([
-    ["Seeds", 0], ["Bugs", 0], ["Fruit", 0], ["Fish", 0], ["Spices", 0],
-    ["Wood", 0], ["Clay", 0], ["Rocks", 0], ["Steel", 0],
-    ["Coal", 0], ["Iron", 0], ["Steel", 0], ["Gems", 0],
-    ["Instinct", 0], ["Song", 0], ["Books", 0], ["Maps", 0]
-  ]);
+// ========================== //
+@Injectable({ providedIn: 'root' })
+export class PeepService
+{	// ------------------ //
+	// --- Parameters --- //
+	Peeps: Peep[] = [];
+	PeepCost: number[] = [10, 0, 0, 0, 0]
+	PeepDist: number = 0;
 
-  // -- Methods -- //
-  constructor(){ }
+	Capacity: number = 10;	// Total number of Peeps allowed //
 
-  // Accessors //
-  GetPeepsByTask(task: string): Peep[]
-  { // Return the list of peeps that are currently performing this task //
-    let foundPeeps = this.Peeps.filter(p => p.task === task)
-    return foundPeeps;
-  }
-  
-  // Mutators //
-  AddPeep(): Peep
-  { // Get the default egg properties //
-    let eggTask = TASKMAP.get('Egg') as Task;
+	Upgrades: number = 0;
+	UpgradeCosts: number[] = [0, 0, 0, 0, 0];
 
-    // Pick a random hatch time //
-    let hatchTime = Math.floor(eggTask.dur + 2 * eggTask.var * (Math.random() - 0.5));
+	// --------------- //
+	// --- Methods --- //
+	constructor() { }
+	Init()
+	{	// Set peep capacity //
+		this.Capacity = 10;
+		for(let u = 0; u < this.Upgrades; u++)
+			this.Capacity += 10 + 5 * (u + 1);
 
-    // Create the new peep as an egg //
-    let id = 0;
-    if(this.Peeps.length) // Make sure there's a peep in there first //
-      id = this.Peeps[this.Peeps.length - 1].id + 1; // ID can just be one more than the last peep in the list //
+		// Set upgrade costs //
+		this.UpgradeCosts = [0, 0, 0, 0, 0];
+		this.UpgradeCosts[1] = COSTS_HOUSING[this.Upgrades][0];
+		this.UpgradeCosts[4] = COSTS_HOUSING[this.Upgrades][1];
+	}
 
-    let egg = Object.assign({}, PEEPMAP.get('egg') as Peep); // Default egg //
-    egg.id = id;          // Set ID             //
-    egg.dur = hatchTime;  // Set time to hatch  //
+	// Mutators //
+	Make_Egg(): Peep
+	{	// Pick a random hatch time //
+		let hatchTime = Math.floor(BANK_TASK.EGG.dur + 2 * BANK_TASK.EGG.var * (Math.random() - 0.5));
 
-    // Append the egg into the list and return it //
-    this.Peeps.push(egg);
-    return egg;
-  }
-  HatchPeep(egg:Peep): void
-  { // Randomly determine the species for this peep //
-    let species = Math.floor((PEEPBANK.length - 1) * Math.random()) + 1;  // Avoid the "Egg" //
+		// Create the new peep as an egg //
+		let id = 0;
+		if(this.Peeps.length) // Make sure there's a peep in there first //
+			id = this.Peeps[this.Peeps.length - 1].id + 1; // ID can just be one more than the last peep in the list //
 
-    // Make the new peep, but keep the same id //
-    let peep = Object.assign({}, PEEPBANK[species] as Peep);
-    peep.id = egg.id;   // Set ID //
+		let egg = Object.assign({}, BANK_PEEP.EGG); // Default egg properties //
+		egg.id = id;          // Set ID             //
+		egg.dur = hatchTime;  // Set time to hatch  //
 
-    // Inject the egg into the peep list //
-    this.Peeps[this.Peeps.findIndex(p => p.id === egg.id)] = peep;
-  }
+		// Append the egg into the list and return it //
+		this.Peeps.push(egg);
+		return egg;
 
-  SetPeepTask(task:string): void
-  { // Sets the first available idle peep to this task //
-    let idlePeeps = this.GetPeepsByTask('Idle');
-    if(idlePeeps.length)
-    { // Assign the task to the first peep available //
-      let idx = this.Peeps.indexOf(idlePeeps[0])
-      this.Peeps[idx].task = task;
+	}
+	Make_Chick(egg: Peep): Peep
+	{	// Randomly determine the species for this peep //
+		let species = Math.floor((Object.keys(BANK_PEEP).length - 2) * Math.random()) + 2;  // Avoid the "Egg" and "Chick" //
+		for(let roll = 0; roll < 4; roll++)
+		{	// Re-roll the peep if it landed on the Void birb //
+			if(species === 2)	species = Math.floor((Object.keys(BANK_PEEP).length - 2) * Math.random()) + 2;
+			else				continue;
+		}
 
-      // Reset the carry capacity //
-      this.Peeps[idx].carry = 0;
+		// Pick a random maturity time //
+		let matureTime = Math.floor(BANK_TASK.CHICK.dur + 2 * BANK_TASK.CHICK.var * (Math.random() - 0.5));
 
-      // Set up a new task duration //
-      let thisTask = TASKMAP.get(task) as Task;
-      this.Peeps[idx].dur = thisTask.dur + Math.floor(2 * thisTask.var * (Math.random() - 0.5));
-    }
-  }
-  SetPeepIdle(task:string): void
-  { // Sets the first working peep in the given task to idle //
-    let taskPeeps = this.GetPeepsByTask(task);
-    if(taskPeeps.length)
-    { // Remove the task from the first peep available //
-      let idx = this.Peeps.indexOf(taskPeeps[0])
-      this.Peeps[idx].task = 'Idle';
+		// Make the new peep, but keep the same id //
+		let peep = Object.assign({}, Object.values(BANK_PEEP)[species] as Peep);
+		let chick = Object.assign({}, BANK_PEEP.CHICK);
 
-      // Reset the carry capacity and duration //
-      this.Peeps[idx].carry = 0;
-      this.Peeps[idx].dur = 0;
-    }
-  }
+		chick.id = egg.id;   // Set ID //
+		chick.str = peep.str; // Pass the stats to the chick //
+		chick.dex = peep.dex;
+		chick.int = peep.int;
+		chick.span = peep.span / 2;	// They're a little smaller :) //
+		chick.name = peep.code; // So we can retrieve it later //
+		chick.dur = matureTime;
 
-  // Updaters //
-  Update(): void
-  { // Iterate through each peep in the list //
-    this.Update_Production();
-    this.Update_Movement();
-  }
-  Update_Production(): void
-  { // Asks each peep to produce based on current task //
-    for(let p of this.Peeps)
-    { // Check what task this peep is performing //
-      if(p.task === "Egg")
-      { // Bring it one tick closer to hatching //
-        p.dur--;
+		// Inject the egg into the peep list //
+		this.Peeps[this.Peeps.findIndex(p => p.id === egg.id)] = chick;
+		return chick;
+	}
+	Make_Peep(chick: Peep): Peep
+	{	// Pull the species from the chick //
+		let speciesCode = chick.name;
 
-        // Check if this causes the egg to hatch //
-        if(p.dur === 0) this.HatchPeep(p);
-      }
-      else if(p.task === "Idle")
-      { /* Idle peeps chat with other idle peeps and have the time to think */ }
-      else if(p.dur !== -1)
-      { // This peep is working on something //
-        p.dur = Math.max(0, p.dur - p.dex); // Reduce duration by the dexterity of the peep //
+		// Make the new peep, but keep the same id //
+		let peep = Object.assign({}, Object.values(BANK_PEEP).find(p => p.code == speciesCode) as Peep);
+		peep.id = chick.id;   // Set ID //
 
-        // Check if we have completed work on this task //
-        if(p.dur === 0)
-        { // Acquire goods according to yield and strength //
-          let thisTask = TASKMAP.get(p.task) as Task;
-          let upgLv = this.Upgrades.get(p.task) as number;
-          p.carry += (thisTask.yield + upgLv) + Math.ceil(p.str * Math.random());
+		// Inject the chick into the peep list //
+		this.Peeps[this.Peeps.findIndex(p => p.id === chick.id)] = peep;
+		return peep;
+	}
 
-          // Make sure we don't go over capacity //
-          if(p.carry * thisTask.wgt > 4 * p.str)
-            p.carry = Math.ceil(4 * p.str / thisTask.wgt);
+	SetTask(task: Task): void
+	{	// Sets the first available idle peep to this task //
+		let idlePeeps = this.PeepsByTask(BANK_TASK.IDLE);
+		if(idlePeeps.length)
+		{ // Assign the task to the first peep available //
+			let idx = this.Peeps.indexOf(idlePeeps[0])
+			this.Peeps[idx].task = task.code;
 
-          // Reset the duration //
-          p.dur = thisTask.dur + Math.floor(2*thisTask.var*(Math.random() - 0.5));
-        }
-      }
-      // Else, this peep is dumping their contents into the storage //
-    }
-  }
-  Update_Movement(): void
-  { // Get each peep's icon and move accordingly //
-    for(let p of this.Peeps)
-    { // Get the peep's icon //
-      let peepIcons = document.getElementsByName(p.id.toString());
-      if(!peepIcons.length) continue;
-      let peepIcon = peepIcons[0];
-      
-      // Get its position and orientation //
-      let x = (peepIcon.style.left ? parseFloat(peepIcon.style.left.split('%')[0]) : 50*Math.random() + 25);
-      let y = (peepIcon.style.top ? parseFloat(peepIcon.style.top.split('%')[0]) : 50*Math.random() + 25);
-      let sx = parseFloat(peepIcon.style.transform.split('(')[0].split(')')[0]);
-      
-      // Get the velocity //
-      let vx = 2 * Math.tan(Math.PI/2 * (Math.random() - 0.5))**5;
-      let vy = 2 * Math.tan(Math.PI/2 * (Math.random() - 0.5))**5;
+			// Reset the carry capacity //
+			this.Peeps[idx].carry = 0;
 
-      // -- Make the peep move, but only sometimes -- //
-      if(Math.random() < 0.05 * p.dex && p.task !== "Egg")
-      {
-        if(Math.abs(vx) > 0.05) sx = (vx > 0 ? +1 : -1);
+			// Set up a new task duration //
+			this.Peeps[idx].dur = task.dur + Math.floor(2 * task.var * (Math.random() - 0.5));
+		}
+	}
+	SetIdle(task: Task): void
+	{	// Sets the first working peep in the given task to idle //
+		let taskPeeps = this.PeepsByTask(task);
+		if(taskPeeps.length)
+		{ // Remove the task from the first peep available //
+			let idx = this.Peeps.indexOf(taskPeeps[0])
+			this.Peeps[idx].task = BANK_TASK.IDLE.code;
 
-        if(vy > 0.05)       peepIcon.className = 'peep front';
-        else if(vy < -0.05) peepIcon.className = 'peep back';
-        else                peepIcon.className = 'peep side';
+			// Reset the carry capacity and duration //
+			this.Peeps[idx].carry = 0;
+			this.Peeps[idx].dur = 0;
+		}
+	}
 
-        if((5 < x + vx) && (x + vx < 95))
-          peepIcon.style.left = (x + vx) + '%';
-        if((5 < y + vy) && (y + vy < 90))
-          peepIcon.style.top = (y + vy) + '%';
-        peepIcon.style.transform = 'scaleX(' + sx + ')';
-      }
-    }
-  }
+	// Accessors //
+	PeepsByTask(task: Task): Peep[]
+	{	// Return a list of peeps that are currently performing the given task //
+		return this.Peeps.filter(p => p.task == task.code);
+	}
 
-  
+	// Informative //
+	CanUpgrade(): boolean
+	{
+		return this.Upgrades < COSTS_HOUSING.length;
+	}
+	UpgradeDelta(): number { return 10 * (this.Upgrades + 1); }
 
+	// Game Loop //
+	Update(): void
+	{	// Get each peep's icon and move accordingly //
+		for(let p of this.Peeps)
+		{ // Get the peep's icon //
+			let peepIcons = document.getElementsByName(p.id.toString());
+			if(!peepIcons.length) continue;
+			let peepIcon = peepIcons[0];
+
+			// Set its position and orientation if we cannot get it //
+			let x = 50 * Math.random() + 25;
+			let y = 50 * Math.random() + 25;
+			let sx = 1;
+
+			if(peepIcon.style.left) x = parseFloat(peepIcon.style.left.split('%')[0]);
+			if(peepIcon.style.top) y = parseFloat(peepIcon.style.top.split('%')[0]);
+			if(peepIcon.style.transform) sx = parseFloat(peepIcon.style.transform.split('(')[0].split(')')[0]);
+
+			// Get the velocity //
+			let vx = (p.dex - 1) * Math.tan(Math.PI / 2 * (Math.random() - 0.5)) ** 5;
+			let vy = (p.dex - 1) * Math.tan(Math.PI / 2 * (Math.random() - 0.5)) ** 5;
+
+			// -- Make the peep move, but only sometimes -- //
+			if(Math.random() < 0.05 * p.dex && p.task !== "Egg")
+			{	// Set the x-scale to flip the peep if need be //
+				if(Math.abs(vx) > 0.05) sx = (vx > 0 ? +1 : -1);
+
+				// Pick a different orientation based on the y velocity //
+				if(vy > 0.05) peepIcon.className = 'PEEP FRONT';
+				else if(vy < -0.05) peepIcon.className = 'PEEP BACK';
+				else peepIcon.className = 'PEEP SIDE';
+
+				// Make sure that the peep is kept in bounds when moving //
+				if((5 < x + vx) && (x + vx < 95)) peepIcon.style.left = (x + vx) + '%';
+				if((5 < y + vy) && (y + vy < 90)) peepIcon.style.top = (y + vy) + '%';
+				peepIcon.style.transform = 'scaleX(' + sx + ')';
+
+				// Add this distance to the total peep distance travelled //
+				this.PeepDist += Math.floor(Math.sqrt(vx * vx + vy * vy));
+			}
+		}
+	}
 }

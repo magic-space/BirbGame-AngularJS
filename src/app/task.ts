@@ -1,10 +1,9 @@
 export interface Task
 {	// Information and Relationships //
 	code: string;	// Internal task code 				//
-	name: string;	// Display name for this task		//
-	group: string;	// Resource this task produces for 	//
+	res: string;	// Resource this task produces for 	//
 	desc: string; 	// Description of task 				//
-	//tier: number;
+	tier: number;	// Determines the order of tasks	//
 
 	// Production Rate //
 	dur: number;	// How long does the task take on average?		//

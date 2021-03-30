@@ -8,12 +8,16 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PeepComponent } from './peep/peep.component';
 import { PlayerComponent } from './player/player.component';
+import { TaskComponent } from './task/task.component';
+import { ResourceComponent } from './resource/resource.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     PeepComponent,
-    PlayerComponent
+    PlayerComponent,
+    TaskComponent,
+    ResourceComponent
   ],
   imports: [
     BrowserModule,

@@ -2,133 +2,238 @@
 // Internal //
 import { Peep } from './peep';
 import { Task } from './task';
+import { Resource } from './resource';
 
 // === DEFINITIONS === //
-// Data Banks //
-export const PEEPBANK: Peep[] = 
-[
-	{id:0, dur:0, carry:0, str:1, dex:1, task:"Egg", code:"egg", name:"egg" },
+// Data Banks (Enums) //
+export const BANK_PEEP = {
+	// code, name, str, dex, span	<-- Peep specific stats
+	// task, dur, carry, id			<-- Mutable parameters
 
-	{id:0, dur:0, carry:0, str:4, dex:2,  task:"Idle", code:"blackCrestedTitmouse", name:"Black Crested Titmouse" },
-	{id:0, dur:0, carry:0, str:3, dex:4,  task:"Idle", code:"blueTit", name:"Blue Tit" },
-	{id:0, dur:0, carry:0, str:3, dex:3,  task:"Idle", code:"europeanRobin", name:"European Robin" },
-	{id:0, dur:0, carry:0, str:2, dex:4,  task:"Idle", code:"goldenCrestedKinglet", name:"Golden Crested Kinglet" },
-	{id:0, dur:0, carry:0, str:3, dex:2,  task:"Idle", code:"houseSparrow", name:"House Sparrow" },
-	{id:0, dur:0, carry:0, str:3, dex:4,  task:"Idle", code:"houseWren", name:"House Wren" },
-]
-export const TASKBANK: Task[] =
-[
-	{ dur:30, var:15, yield:0, val:0, wgt:0, upkeep:0, code:"Egg", group:"None", name:"Hatching",
-		desc:"" },
-	{ dur:1, var:0, yield:0, val:0, wgt:0, upkeep:0, code:"Idle", group:"None", name:"Idling",
-		desc:"" },
+	// Special states //
+	EGG: {	// Hatching a new peep //
+		code: "egg", name: "Egg", str: 0, dex: 0, int: 0, span: 0,
+		task: "Egg", dur: 0, carry: 0, id: 0
+	},
+	CHICK: {	// Maturing a new peep //
+		code: "chick", name: "Chick", str: 1, dex: 1, int: 0, span: 0,
+		task: "Chick", dur: 0, carry: 0, id: 0
+	},
+	VOID: {	// Easter egg //
+		code: "void", name: "Void", str: 9, dex: 9, int: 9, span: 0,
+		task: "Idle", dur: 0, carry: 0, id: 0
+	},
 
-	{ dur:30, 	var:10,	yield:1, val:1, wgt:1, upkeep:1, code:"Seeds", group:"Food", name:"Farming",
-		desc:"A staple. Not worth much, but fundamental for healthy living." }, 
-	{ dur:240, 	var:45,	yield:2, val:10, wgt:2, upkeep:3, code:"Bugs", group:"Food", name:"Catching",
-		desc:"Squishy and slimy, yet satisfying! Takes a bit to catch them all."  },
-	{ dur:90,	var:20,	yield:4, val:3, wgt:2, upkeep:1, code:"Fruit", group:"Food", name:"Picking",
-		desc:"Sweet and juicy, the perfect snack that doesn't bite back."  },
-	{ dur:400, 	var:80,	yield:1, val:40, wgt:8, upkeep:5, code:"Fish", group:"Food", name:"Fishing",
-		desc:"Can grow to enormous sizes, fit for those who can capture them."  },
-	{ dur:1500, var:0, 	yield:10, val:1, wgt:1, upkeep:1, code:"Spices", group:"Food", name:"Spicing",
-		desc:"Rare to come by, so it is valuable even if not very filling."  }, 
+	// Citizens //
+	BLACK_CRESTED_TITMOUSE: {
+		code: "blackCrestedTitmouse", name: "Black Crested Titmouse", str: 3, dex: 3, int: 3, span: 24,
+		task: "Idle", dur: 0, carry: 0, id: 0
+	},
+	BLUE_TIT: {
+		code: "blueTit", name: "Blue Tit", str: 2, dex: 3, int: 3, span: 18,
+		task: "Idle", dur: 0, carry: 0, id: 0
+	},
+	EUROPEAN_ROBIN: {
+		code: "europeanRobin", name: "European Robin", str: 2, dex: 3, int: 3, span: 20,
+		task: "Idle", dur: 0, carry: 0, id: 0
+	},
+	GOLDEN_CRESTED_KINGLET: {
+		code: "goldenCrestedKinglet", name: "Golden Crested Kinglet", str: 2, dex: 3, int: 3, span: 16,
+		task: "Idle", dur: 0, carry: 0, id: 0
+	},
+	HOUSE_SPARROW: {
+		code: "houseSparrow", name: "House Sparrow", str: 3, dex: 3, int: 3, span: 22,
+		task: "Idle", dur: 0, carry: 0, id: 0
+	},
+	HOUSE_WREN: {
+		code: "houseWren", name: "House Wren", str: 3, dex: 3, int: 3, span: 22,
+		task: "Idle", dur: 0, carry: 0, id: 0
+	},
+}
+export const BANK_RESOURCE = {	// Enumerable for each resource available //
+	FOOD:	{ code: "Food",		desc: "Resources for consumption; necessary for sustaining your Peeps." },
+	NEST:	{ code: "Nest",		desc: "Resources for construction; necessary for housing and containment." },
+	ORE:	{ code: "Ore",		desc: "Resources for production; necessary for tools and maintaining equipment." },
+	ALCHEMY:{ code: "Alchemy",	desc: "You're not sure what this is really, but you get the feeling it will be useful later." },	// Not implemented yet //
+	SKILL:	{ code: "Skill",	desc: "Resources for advancement; necessary for technology." },
+}
+export const BANK_TASK = {
+	// code, res, tier, desc				<-- Task information and relationship
+	// dur, var, yield, val, wgt, upkeep	<-- Task production specifics
 
-	{ dur:50, 	var:10,	yield:1, val:1, wgt:3, upkeep:2, code:"Wood", group:"Nest", name:"Building",
-		desc:"Single-talonedly the best material to build a nest with." },
-	{ dur:360, 	var:30,	yield:4, val:3, wgt:4, upkeep:3, code:"Clay", group:"Nest", name:"Building",
-		desc:"Malleable enough to adapt to any situation. Make sure you bake it!"  },
-	{ dur:180, 	var:20,	yield:2, val:6, wgt:6, upkeep:5, code:"Rocks", group:"Nest", name:"Building",
-		desc:"The most durable material, but heavy and hard to handle."  },
-	{ dur:1500,	var:0,	yield:10, val:1, wgt:3, upkeep:1, code:"Glass", group:"Nest", name:"Building",
-		desc:"Transparent and fragile, but incredibly beautiful."  }, 
+	// --- Produces nothing --- //
+	EGG: {	// Egg state //
+		code: "Egg", res: "None", tier: 0, desc: "Shh, they need peace and quiet...",
+		dur: 60, var: 30, yield: 0, val: 0, wgt: 0, upkeep: 0
+	},
+	CHICK: {	// Chick state //
+		code: "Chick", res: "None", tier: 0, desc: "Growing up to be big and strong!",
+		dur: 1440, var: 720, yield: 0, val: 0, wgt: 0, upkeep: 0
+	},
+	IDLE: {	// Idle state //
+		code: "Idle", res: "None", tier: 0, desc: "Just chirpin' around, looking for something to do.",
+		dur: 1, var: 0, yield: 0, val: 0, wgt: 0, upkeep: 0
+	},
 
-	{ dur:75, 	var:25,	yield:1, val:1, wgt:4, upkeep:3, code:"Coal", group:"Ore", name:"Mining",
-		desc:"A dark rock that can bring warmth and light."  },
-	{ dur:300, 	var:60,	yield:1, val:9, wgt:8, upkeep:5, code:"Iron", group:"Ore", name:"Mining",
-		desc:"A sturdy, shiny metal useful for making tools."  },
-	{ dur:750, 	var:90,	yield:1, val:50, wgt:12, upkeep:8, code:"Steel", group:"Ore", name:"Smelting",
-		desc:"Refining Iron has its benefits."  },
-	{ dur:1500,	var:0,	yield:10, val:1, wgt:1, upkeep:3, code:"Gems", group:"Ore", name:"Mining",
-		desc:"Shiny, rare, and worth a lot in trade."  },
+	// --- Produces Food --- //
+	SEEDS: {
+		code: "Seeds", res: "Food", tier: 1, desc: "A staple. Not worth much, but fundamental for healthy living.",
+		dur: 60, var: 10, yield: 4, val: 1, wgt: 1, upkeep: 1
+	},
+	BUGS: {
+		code: "Bugs", res: "Food", tier: 2, desc: "Squishy and slimy, yet satisfying! Takes a bit to catch them all.",
+		dur: 240, var: 45, yield: 2, val: 12, wgt: 1, upkeep: 3
+	},
+	FRUIT: {
+		code: "Fruit", res: "Food", tier: 3, desc: "Sweet and juicy, the perfect snack that doesn't bite back.",
+		dur: 90, var: 20, yield: 3, val: 4, wgt: 1, upkeep: 2
+	},
+	FISH: {
+		code: "Fish", res: "Food", tier: 4, desc: "Can grow to enormous sizes, fit for those who can capture them.",
+		dur: 400, var: 80, yield: 1, val: 40, wgt: 8, upkeep: 5
+	},
+	SPICES: {
+		code: "Spices", res: "Food", tier: 5, desc: "Rare to come by, so it is valuable even if not very filling.",
+		dur: 1500, var: 0, yield: 1, val: 1, wgt: 1, upkeep: 1
+	},
 
-	{ dur:45, 	var:30,	yield:1, val:1, wgt:1, upkeep:0, code:"Instinct", group:"Skill", name:"Thinking",
-		desc:"Knowledge that comes to you naturally. Total is limited by roll call."  }, 
-	{ dur:90, 	var:60,	yield:1, val:1, wgt:1, upkeep:0, code:"Song", group:"Skill", name:"Singing",
-		desc:"Idle chriping with friends can lead to great scientific advancements."  },
-	{ dur:320, 	var:80,	yield:1, val:20, wgt:3, upkeep:1, code:"Books", group:"Skill", name:"Writing",
-		desc:"Reading is the best way to consistently share and preserve knowledge."  },
-	{ dur:900, 	var:90,	yield:1, val:50, wgt:2, upkeep:2, code:"Maps", group:"Skill", name:"Exploring",
-		desc:"You may not know where you're going, but you surely know where you've been."  }
-]
+	// --- Produces Nest --- //
+	WOOD: {
+		code: "Wood", res: "Nest", tier: 1, desc: "Single-talonedly the best material to build a nest with.",
+		dur: 90, var: 20, yield: 4, val: 1, wgt: 2, upkeep: 2
+	},
+	MOSS: {	// No assets yet //
+		code: "Moss", res: "Nest", tier: 2, desc: "Soft and warm, perfect for the young ones.",
+		dur: 150, var: 60, yield: 6, val: 2, wgt: 1, upkeep: 1
+	},
+	CLAY: {
+		code: "Clay", res: "Nest", tier: 3, desc: "Malleable enough to adapt to any situation. Make sure you bake it!",
+		dur: 240, var: 75, yield: 6, val: 8, wgt: 4, upkeep: 3
+	},
+	ROCKS: {
+		code: "Rocks", res: "Nest", tier: 4, desc: "The most durable material, but heavy and hard to handle.",
+		dur: 180, var: 90, yield: 2, val: 12, wgt: 6, upkeep: 5
+	},
+	GLASS: {
+		code: "Glass", res: "Nest", tier: 5, desc: "Transparent and fragile, but incredibly beautiful.",
+		dur: 1500, var: 0, yield: 1, val: 1, wgt: 1, upkeep: 1
+	},
 
-export const UPGCOSTMAP:Map<string, number[][]> = new Map<string, number[][]>([
-	// Costs are in [Food / Nest / Ore / Skill] //
+	// --- Produces Ore --- //
+	FLINT: {
+		code: "Flint", res: "Ore", tier: 1, desc: "A soft rock that's capable of sparking.",
+		dur: 75, var: 45, yield: 1, val: 2, wgt: 3, upkeep: 2
+	},
+	COPPER: {
+		code: "Copper", res: "Ore", tier: 2, desc: "A soft, malleable metal that is more workable than stone.",
+		dur: 180, var: 30, yield: 1, val: 8, wgt: 5, upkeep: 3
+	},
+	IRON: {
+		code: "Iron", res: "Ore", tier: 3, desc: "A sturdy, shiny metal useful for making tools.",
+		dur: 360, var: 60, yield: 1, val: 24, wgt: 8, upkeep: 5
+	},
+	STEEL: {
+		code: "Steel", res: "Ore", tier: 4, desc: "Refining iron has its benefits, making an incredibly strong metal.",
+		dur: 900, var: 90, yield: 1, val: 80, wgt: 12, upkeep: 8
+	},
+	OBSIDIAN: {	// No assets yet //
+		code: "Obsidian", res: "Ore", tier: 5, desc: "A material that keeps getting sharper the more it breaks.",
+		dur: 1500, var: 0, yield: 1, val: 1, wgt: 1, upkeep: 1
+	},
 
-	// -- Capacity Upgrades -- //
-	["House", 	[[0,40,0,20], [0,120,0,50], [0,375,0,160], [0,700,0,300], [0,1600,0,750], [0,2850,0,1200]]],
+	// --- Produces Alchemy --- //
+	SALT: {
+		code: "Salt", res: "Alchemy", tier: 1, desc: "A great preserver, but make sure not to eat it!",
+		dur: 120, var: 40, yield: 3, val: 1, wgt: 1, upkeep: 2
+	},
+	COAL: {
+		code: "Coal", res: "Alchemy", tier: 2, desc: "A dark rock that can bring warmth and light when kindled.",
+		dur: 320, var: 60, yield: 3, val: 3, wgt: 3, upkeep: 3
+	},
+	SULFUR: {
+		code: "Sulfur", res: "Alchemy", tier: 3, desc: "Smells awful, but has incredible power locked within.",
+		dur: 675, var: 75, yield: 3, val: 10, wgt: 3, upkeep: 5
+	},
+	OIL: {
+		code: "Oil", res: "Alchemy", tier: 4, desc: "A sticky substance that is highly flammable, and potentially refinable.",
+		dur: 1080, var: 90, yield: 3, val: 20, wgt: 1, upkeep: 8
+	},
+	GEMS: {
+		code: "Gems", res: "Alchemy", tier: 5, desc: "Shiny, colorful, rare, and worth a lot in trades for some reason.",
+		dur: 1500, var: 0, yield: 1, val: 1, wgt: 1, upkeep: 1
+	},
 
-	// 				100, 		  250, 		    450, 		  700,				1000
-	["Food", 	[[0,35,0,15], [0,115,0,70], [0,275,0,195], [0,550,0,450], [0,800,0,850]]],
-	["Nest", 	[[0,50,0,30], [0,150,0,95], [0,320,0,260], [0,650,0,580], [0,1000,0,880]]],
-	["Ore", 	[[0,70,0,40], [0,195,0,120], [0,400,0,300], [0,700,0,640], [0,1200,0,950]]],
-	["Skill", 	[[0,25,0,20], [0,100,0,100], [0,240,0,320], [0,500,0,700], [0,750,0,1200]]],
+	// --- Produces Skill --- //
+	INSTINCT: {	// Not actually workable //
+		code: "Instinct", res: "Skill", tier: 1, desc: "Knowledge that comes to you naturally. Total is limited by roll call.",
+		dur: 90, var: 10, yield: 1, val: 1, wgt: 1, upkeep: 0
+	},
+	SONG: {	// Not actually workable //
+		code: "Song", res: "Skill", tier: 2, desc: "Idle chriping with friends can lead to great scientific advancements.",
+		dur: 150, var: 15, yield: 1, val: 2, wgt: 1, upkeep: 0
+	},
+	BOOKS: {
+		code: "Books", res: "Skill", tier: 3, desc: "Reading is the best way to consistently share and preserve knowledge.",
+		dur: 600, var: 90, yield: 3, val: 10, wgt: 3, upkeep: 1
+	},
+	MAPS: {
+		code: "Maps", res: "Skill", tier: 4, desc: "You may not know where you're going, but you surely know where you've been.",
+		dur: 900, var: 90, yield: 1, val: 30, wgt: 1, upkeep: 3
+	},
+	ARTS: {	// No assets yet //
+		code: "Arts", res: "Skill", tier: 5, desc: "A labour of love, but has little practical value. A display of prosperity, surely.",
+		dur: 1500, var: 0, yield: 1, val: 1, wgt: 1, upkeep: 1
+	},	
+}
 
-	// -- Production Upgrades -- //
-	["Seeds",	[[0,0,25,10], [0,0,100,45], [0,0,200,95]]],
-	["Bugs",	[[0,0,75,30], [0,0,190,85], [0,0,350,160]]],
-	["Fruit",	[[0,0,180,100], [0,0,360,210], [0,0,700,420]]],
-	["Fish",	[[0,0,350,250], [0,0,720,460], [0,0,1200,750]]],
-	["Spices",	[[0,0,0,0]]],	// Not yet implemented //
+// Maps //
+export const COSTS_HOUSING: number[][] = [
+	// Housing upgrades use only [Nest, Skill] //
+	// 10		25			45			
+	[40, 20], [120, 50], [375, 160], [700, 300], [1600, 750], [2850, 1200]
+];
+export const COSTS_CAPACITY: Map<Resource, number[][]> = new Map<Resource, number[][]>([
+	// Capacity upgrades use only [Nest, Skill] //
+	// Current Capacity		100			250			450			700			1000		1350		1750
+	[BANK_RESOURCE.FOOD,	[[35, 15],	[115, 70],	[275, 195],	[550, 450],	[800, 850]]],
+	[BANK_RESOURCE.NEST,	[[50, 30],	[150, 95],	[320, 260],	[650, 580],	[1000, 880]]],
+	[BANK_RESOURCE.ORE,		[[70, 40],	[195, 120],	[400, 300],	[700, 640],	[1200, 950]]],
+	[BANK_RESOURCE.ALCHEMY,	[[100, 60],	[270, 160],	[550, 400],	[800, 800],	[1500, 1600]]],
+	[BANK_RESOURCE.SKILL,	[[25, 20],	[100, 100],	[240, 320],	[500, 700],	[750, 1200]]]
+]);
+export const COSTS_UPGRADE: Map<Task, number[][]> = new Map<Task, number[][]>([
+	// Task upgrades use only [Ore, Skill] //
+	[BANK_TASK.EGG,		[[0, 0]]],	// No upgrades available //
+	[BANK_TASK.CHICK,	[[0, 0]]],	// No upgrades available //
+	[BANK_TASK.IDLE,	[[0, 0]]],	// No upgrades available //
 
-	["Wood",	[[0,0,35,20], [0,0,140,65], [0,0,280,140]]],
-	["Clay",	[[0,0,105,60], [0,0,270,150], [0,0,500,300]]],
-	["Rocks",	[[0,0,215,160], [0,0,450,340], [0,0,800,700]]],
-	["Glass",	[[0,0,0,0]]],	// Not yet implemented //
+	[BANK_TASK.SEEDS,	[[25, 10],		[100, 45],		[200, 95]]],
+	[BANK_TASK.BUGS,	[[75, 30],		[190, 85],		[350, 160]]],
+	[BANK_TASK.FRUIT,	[[180, 100],	[360, 210],		[700, 420]]],
+	[BANK_TASK.FISH,	[[350, 250],	[720, 460],		[1200, 750]]],
+	[BANK_TASK.SPICES,	[[0, 0]]],	// Not yet implemented //
 
-	["Coal",	[[0,0,50,35], [0,0,200,95], [0,0,420,215]]],
-	["Iron",	[[0,0,150,90], [0,0,350,190], [0,0,730,405]]],
-	["Steel",	[[0,0,320,185], [0,0,750,450], [0,0,1350,900]]],
-	["Gems",	[[0,0,0,0]]],	// Not yet implemented //
+	[BANK_TASK.WOOD,	[[35, 20],		[140, 65],		[280, 140]]],
+	[BANK_TASK.MOSS,	[[65, 40],		[200, 105],		[380, 200]]],
+	[BANK_TASK.CLAY,	[[105, 60],		[270, 150],		[500, 300]]],
+	[BANK_TASK.ROCKS,	[[215, 160],	[450, 340],		[800, 700]]],
+	[BANK_TASK.GLASS,	[[0, 0]]],	// Not yet implemented //
 
-	["Instinct",[[]]],	// No upgrades available //
-	["Song",	[[]]],	// No upgrades available //
-	["Books",	[[0,0,150,200], [0,0,600,900], [0,0,1600,2400]]],
-	["Maps",	[[0,0,250,400], [0,0,900,1500], [0,0,2500,4000]]],
-]) 
+	[BANK_TASK.FLINT,	[[50, 30],		[175, 80],		[350, 200]]],
+	[BANK_TASK.COPPER,	[[100, 60],		[270, 150],		[500, 290]]],
+	[BANK_TASK.IRON,	[[150, 90],		[350, 190],		[730, 405]]],
+	[BANK_TASK.STEEL,	[[320, 185],	[750, 450],		[1350, 900]]],
+	[BANK_TASK.OBSIDIAN,[[0, 0]]],	// Not yet implemented //
 
-// Data Maps //
-export const PEEPMAP: Map<string, Peep> = new Map<string, Peep>([
-	[PEEPBANK[0].code, PEEPBANK[0]],	// Egg 						//
-	[PEEPBANK[1].code, PEEPBANK[1]],	// Black Crested Titmouse 	//
-	[PEEPBANK[2].code, PEEPBANK[2]],	// Blue Tit 				//
-	[PEEPBANK[3].code, PEEPBANK[3]],	// European Robin 			//
-	[PEEPBANK[4].code, PEEPBANK[4]],	// Golden Crested Kinglet 	//
-	[PEEPBANK[5].code, PEEPBANK[5]],	// House Sparrow 			//
-	[PEEPBANK[6].code, PEEPBANK[6]],	// House Wren 				//
-])
-export const TASKMAP: Map<string, Task> = new Map<string, Task>([
-	[TASKBANK[0].code, TASKBANK[0]],	// Egg 		//
-	[TASKBANK[1].code, TASKBANK[1]],	// Idle 	//
+	[BANK_TASK.SALT,	[[70, 45],		[210, 120],		[600, 405]]],
+	[BANK_TASK.COAL,	[[145, 85],		[400, 205],		[960, 640]]],
+	[BANK_TASK.SULFUR,	[[260, 110],	[620, 370],		[1300, 950]]],
+	[BANK_TASK.OIL,		[[400, 260],	[950, 680],		[2000, 1400]]],
+	[BANK_TASK.GEMS,	[[0, 0]]],	// Not yet implemented //
 
-	[TASKBANK[2].code, TASKBANK[2]],	// Seeds 	//
-	[TASKBANK[3].code, TASKBANK[3]],	// Bugs 	//
-	[TASKBANK[4].code, TASKBANK[4]],	// Fruit 	//
-	[TASKBANK[5].code, TASKBANK[5]],	// Fish 	//
-	[TASKBANK[6].code, TASKBANK[6]],	// Spices 	//
-
-	[TASKBANK[7].code, TASKBANK[7]],	// Wood 	//
-	[TASKBANK[8].code, TASKBANK[8]],	// Clay 	//
-	[TASKBANK[9].code, TASKBANK[9]],	// Rocks 	//
-	[TASKBANK[10].code, TASKBANK[10]],	// Glass 	//
-
-	[TASKBANK[11].code, TASKBANK[11]],	// Coal		//
-	[TASKBANK[12].code, TASKBANK[12]],	// Iron		//
-	[TASKBANK[13].code, TASKBANK[13]],	// Steel	//
-	[TASKBANK[14].code, TASKBANK[14]],	// Gems		//
-
-	[TASKBANK[15].code, TASKBANK[15]],	// Instinct	//
-	[TASKBANK[16].code, TASKBANK[16]],	// Song		//
-	[TASKBANK[17].code, TASKBANK[17]],	// Books	//
-	[TASKBANK[18].code, TASKBANK[18]],	// Maps		//
-])
+	[BANK_TASK.INSTINCT,[[0, 0]]],	// No upgrades available //
+	[BANK_TASK.SONG,	[[0, 0]]],	// No upgrades available //
+	[BANK_TASK.BOOKS,	[[150, 200],	[600, 900],		[1600, 2400]]],
+	[BANK_TASK.MAPS,	[[250, 400],	[900, 1500],	[2500, 4000]]],
+	[BANK_TASK.ARTS,	[[0, 0]]],	// Not yet implemented //
+]);

@@ -1,0 +1,60 @@
+<div *ngIf="Res"
+	 style="display:grid; grid-template-columns: 32px 180px 80px;
+	 background-color:#cccccc; padding:4px;
+	 border: 0px black solid; border-radius: 4px">
+
+	<!-- The resource icon and the current amount in supply -->
+	<span class="TIP" style="grid-area: 1/1/span 1/span 1;">
+
+		<!-- Resource Tooltip -->
+		<span class="TIPTXT TIPTOP">
+			<!-- Current capacity and upkeep -->
+			Capacity: {{resourceService.TotalUnits.get(Res)}} / {{Capacity}} 
+			({{ResourcePercent(Res)}}%)
+			<span *ngIf="Res.code !== 'Skill'">
+				<br />
+				Daily Upkeep: - {{resourceService.Upkeep(Res)}}
+				<img class="RESOURCE-TIP" [id]="Res.code + '-TIP'"
+					 src="../../assets/icons/Transparent.png" />
+			</span>
+			<br /><br />
+
+			<!-- Next upgrade change and cost -->
+			Upgrade #{{resourceService.UpgradeNum(Res)}}:
+			<span *ngIf="resourceService.CanUpgrade(Res)">
+				(+{{resourceService.UpgradeDelta.get(Res)}} Capacity)
+				<br />
+				<span *ngFor="let c of [0, 1, 2, 3, 4]">
+					<span *ngIf="resourceService.UpgradeCost(Res)[c] > 0">|
+						<span [style.color]="resourceService.ResAmt(resourceService.Resources[c]) >= resourceService.UpgradeCost(Res)[c] ? 'white' : 'red'">
+							{{resourceService.UpgradeCost(Res)[c]}}
+						</span>
+						<img class="RESOURCE-TIP" [id]="resourceService.Resources[c].code + '-TIP'"
+							 src="../../assets/icons/Transparent.png" />
+					</span>
+				</span> |
+			</span>
+			<span *ngIf="!resourceService.CanUpgrade(Res)">Maxed!</span>
+			<br /><br />
+
+			<!-- Resource description -->
+			{{Res.desc}}
+		</span>
+
+		<!-- The resource icon -->
+		<img class="RESOURCE" [id]="Res.code" (click)="Upgrade(Res)"
+			 src="../../assets/icons/Transparent.png" />
+	</span>
+
+	<!-- Current resource amounts + multicolored capacity bar -->
+	<label style="grid-area: 1/2/span 1/span 2; font-weight: bold;">
+		{{Res.code}}: {{Amount}}
+	</label>
+	<div style="grid-area:2/1/span 1/span 3; width:100%; height:16px;
+		 background-color: #eeeeee; display:inline-block;">
+		<div *ngFor="let task of resourceService.TasksOf(Res)"
+			 style="display:inline-block; height:16px;"
+			 [style.backgroundColor]="TaskColor(task.tier)" [style.width]="TaskPercent(task) + '%'">
+		</div>
+	</div>
+</div>
