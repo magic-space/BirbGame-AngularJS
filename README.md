@@ -15,6 +15,9 @@ There currently is no "win" condition, just keep growing your peep-ulation and a
 If you'd like to start over, click the gear in the top right corner to wipe your save file.
 
 ## Changelog
+### 0.9.1:
+Lots of code refactoring! More details coming soon.
+
 ### 0.9.0.1:
 - Fixed an upkeep bug in Chrome (Nest wasn't working - now it's not working in Firefox?)
 - Buffed Bugs to be more valuable and less useless
