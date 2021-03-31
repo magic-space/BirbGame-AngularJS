@@ -28,9 +28,9 @@ Balance Changes:
 - Added and changed a few resource unlocks. For example, Food unlocks are no longer strictly time-based.
 - Minor balance updates. The whole system needs to get this treatment soon.
 - Resource details now show more details. This may be hidden behind a verbosity setting later on.
-- Supply displays now display the total value rather than the units of a resource (e.g. Bugs : 10 --> Bugs : 60). The number of units has been moved to the tooltip
-- Several bugfixes
-- Code refactoring
+- Supply displays now display the total value rather than the units of a resource (e.g. Bugs: 10 --> Bugs: 60). The number of units has been moved to the tooltip.
+- Several bugfixes, including the upkeep bugs from earlier.
+- Code refactoring and restructuring into a more component-service model.
 
 Feature Removals or Bugs:
 - A few assets need fixing up, I'll get on that as soon as possible.
@@ -38,8 +38,8 @@ Feature Removals or Bugs:
 
 ### 0.9.0.1:
 Balance Changes:
-- Fixed an upkeep bug in Chrome (Nest wasn't working - now it's not working in Firefox?)
-- Buffed Bugs to be more valuable and less useless
+- Fixed an upkeep bug in Chrome (Nest wasn't working - now it's not working in Firefox?).
+- Buffed Bugs to be more valuable and less useless.
 
 ### 0.9.0:
 Preliminary release as an Angular application. Fine-tuning needs to be done.
