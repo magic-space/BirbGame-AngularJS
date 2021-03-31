@@ -16,9 +16,28 @@ If you'd like to start over, click the gear in the top right corner to wipe your
 
 ## Changelog
 ### 0.9.1:
-Lots of code refactoring! More details coming soon.
+Feature Additions:
++ New stage of peep development, the Chick. They can't be assigned to anything, but receive a huge boost to Instinct. They are also *exceedingly* adorable.
++ New resources. Now every resource has at least 4 "standard" tiers. Additionally, fifth tier resources are in place, but are planned to have additional function beyond simple collection.
++ A new resource tree. Currently does not do anything important, but is a late-game unlockable.
++ Fixed saving games. Did away with cookies entirely in favor of localStorage
++ A warning prompt when wiping your save.
++ Decided to re-insert the easter egg anyways, but made it exceedingly rare.
+
+Balance Changes:
+- Added and changed a few resource unlocks. For example, Food unlocks are no longer strictly time-based.
+- Minor balance updates. The whole system needs to get this treatment soon.
+- Resource details now show more details. This may be hidden behind a verbosity setting later on.
+- Supply displays now display the total value rather than the units of a resource (e.g. Bugs : 10 --> Bugs : 60). The number of units has been moved to the tooltip
+- Several bugfixes
+- Code refactoring
+
+Feature Removals or Bugs:
+- A few assets need fixing up, I'll get on that as soon as possible.
+- Saving peep data is still large, and needs to get compressed.
 
 ### 0.9.0.1:
+Balance Changes:
 - Fixed an upkeep bug in Chrome (Nest wasn't working - now it's not working in Firefox?)
 - Buffed Bugs to be more valuable and less useless
 
