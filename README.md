@@ -10,6 +10,8 @@ Clicking on a resource or task's icon will allow it to be upgraded, either incre
 
 However, your Peeps will need to be fed, and regular maintainence on housing, storage facilities, and tools will need to be performed. As such, you will find your food, nest, and ore supplies dwindling over time, requiring constant production to stay afloat! Make sure to balance your assignments accordingly. 
 
+As you continue exploring and building your village, you will discover new resources for use. Often these can be powerful, but have an inherent drawback either in time to acquire or in quantity.
+
 There currently is no "win" condition, just keep growing your peep-ulation and amass resources.
 
 If you'd like to start over, click the gear in the top right corner to wipe your save file.
